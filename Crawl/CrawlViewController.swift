@@ -17,20 +17,16 @@ class CrawlViewController: NSViewController {
     @IBOutlet weak var crawlImageButton: NSButton!
 
     private var dataSource: CrawlDataSource!
+    private var keywords: [String] = ["technology"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        crawlField.stringValue = CrawlViewModel.syncModel.title
-        crawlImageButton.image = CrawlViewModel.syncModel.image
-        crawlField.scrollDelegate = self
-
-        //let keyword: String? = getKeyword()
-        dataSource = CrawlDataSource(keyword: "healthcare")
-
-        loadNextItem()
+        dataSource = CrawlDataSource(keywords: keywords)
+        let keywords: [String]? = getKeywords()
+        setupSubviews()
     }
-    
+
     override func viewWillAppear() {
         super.viewWillAppear()
         
@@ -40,10 +36,21 @@ class CrawlViewController: NSViewController {
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true
         window.titleVisibility = .hidden
+        window.makeKeyAndOrderFront(self)
+
+        loadNextItem()
     }
 
     @IBAction func clickCrawlImage(_ sender: AnyObject?) {
         NSWorkspace.shared.open(dataSource.currentItem.url)
+    }
+}
+
+private extension CrawlViewController {
+    func setupSubviews() {
+        crawlField.stringValue = CrawlViewModel.syncModel.title
+        crawlImageButton.image = CrawlViewModel.syncModel.image
+        crawlField.scrollDelegate = self
     }
 
     func loadNextItem() {
@@ -59,7 +66,8 @@ class CrawlViewController: NSViewController {
         }, completionHandler: { [weak self] in
             guard let self = self else { return }
 
-            self.crawlImageButton.image = item.image
+            self.crawlImageButton.image = item.image ?? NSImage(named: "newsIcon")!
+            self.crawlImageButton.displayIfNeeded()
             self.crawlField.stringValue = " " + item.title
 
             NSAnimationContext.runAnimationGroup({ [weak self] _ in
@@ -68,27 +76,26 @@ class CrawlViewController: NSViewController {
             }, completionHandler: {})
         })
     }
+
+    func getKeywords() -> [String]? {
+        let alert = NSAlert()
+        alert.messageText = "Crawl Keywords"
+        alert.informativeText = "Enter keywords separated by spaces or leave blank for general results"
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "Submit")
+
+        let keywordField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
+        keywordField.placeholderString = "Ex: technology apple"
+        alert.accessoryView = keywordField
+        alert.runModal()
+        let value = keywordField.stringValue
+        guard !value.isEmpty && value != " " else { return nil }
+        return value.contains(" ") ? value.components(separatedBy: " ") : [value]
+    }
 }
 
 extension CrawlViewController: MarqueeLabelDelegate {
     func didFinishScrolling(_ string: String) {
         loadNextItem()
-    }
-}
-
-private extension CrawlViewController {
-    func getKeyword() -> String {
-        let alert = NSAlert()
-        alert.messageText = "Crawl Keyword"
-        alert.informativeText = "Enter a keyword or leave blank for general results"
-        alert.alertStyle = .informational
-        alert.addButton(withTitle: "Submit")
-
-        let keywordField = NSTextField(frame: NSRect(x: 0, y: 0, width: 200, height: 24))
-        keywordField.placeholderString = "Keyword"
-        alert.accessoryView = keywordField
-        alert.runModal()
-
-        return keywordField.stringValue
     }
 }

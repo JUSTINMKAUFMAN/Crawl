@@ -12,7 +12,7 @@ import Cocoa
 struct CrawlViewModel {
     let title: String
     let url: URL
-    let image: NSImage
+    let image: NSImage?
 }
 
 extension CrawlViewModel {

@@ -12,14 +12,14 @@ import AppKit
 
 class CrawlDataSource: NSObject {
     private let networkManager = NetworkManager()
-    private var keyword: String?
+    private var keywords: [String]?
     private var items: [NewsItem] = []
     private var index: Int = 0
 
     var currentItem: CrawlViewModel = CrawlViewModel.syncModel
 
-    init(keyword: String? = nil) {
-        self.keyword = keyword
+    init(keywords: [String]? = nil) {
+        self.keywords = keywords
         super.init()
     }
 
@@ -28,11 +28,20 @@ class CrawlDataSource: NSObject {
             index += 1
             completion(items[index].crawlItem)
         } else {
-            networkManager.fetchItems(for: keyword) { [unowned self] items in
-                guard !items.isEmpty else { return }
-                self.items = items
-                self.index = 1
-                completion(items[0].crawlItem)
+            networkManager.fetchItems(for: keywords) { [unowned self] items in
+                if items.isEmpty {
+                    if !self.items.isEmpty {
+                        self.index += 1
+                        if self.index > self.items.count - 1 { self.index = 0 }
+                        completion(self.items[self.index].crawlItem)
+                    } else {
+                        completion(CrawlViewModel.syncModel)
+                    }
+                } else {
+                    self.index = 1
+                    self.items = items
+                    completion(items[0].crawlItem)
+                }
             }
         }
     }

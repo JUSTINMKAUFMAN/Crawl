@@ -12,17 +12,19 @@ import Cocoa
 
 class CrawlDataParser: NSObject {
     private var parser: XMLParser!
-    private var element = ""
-    private var itemTitle = ""
-    private var itemDescription = ""
-    private var itemImageURL = ""
-    private var itemDate = ""
-    private var itemURL = ""
+    private var element: String = ""
+    private var itemTitle: String = ""
+    private var itemDescription: String = ""
+    private var itemImageURL: String = ""
+    private var itemDate: String = ""
+    private var itemURL: String = ""
+
     var items: [NewsItem] = []
 
     init(with data: Data) {
         super.init()
         parser = XMLParser(data: data)
+        parser.shouldResolveExternalEntities = true
         parser.delegate = self
     }
 
@@ -43,22 +45,32 @@ extension CrawlDataParser: XMLParserDelegate {
                 qualifiedName qName: String?,
                 attributes attributeDict: [String: String]) {
         element = elementName
+
         if element == "item" {
             itemTitle = ""
             itemDescription = ""
             itemImageURL = ""
             itemDate = ""
             itemURL = ""
+        } else if ["media:content", "media:thumbnail"].contains(element) {
+            if let url = attributeDict["url"] {
+                itemImageURL = url
+            }
         }
     }
 
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         switch self.element {
-        case "title": self.itemTitle += string
-        case "description": self.itemDescription += string
-        case "link": self.itemURL += string
-        case "pubDate": self.itemDate += string
-        default: break
+        case "title":
+            itemTitle += string
+        case "description":
+            itemDescription += string
+        case "link":
+            itemURL += string
+        case "pubDate":
+            itemDate += string
+        default:
+            break
         }
     }
 
@@ -75,9 +87,9 @@ extension CrawlDataParser: XMLParserDelegate {
         items.append(
             NewsItem(
                 title: itemTitle,
-                description: stringByStrippingHTML(itemDescription),
-                imageURL: getLinkFromImageTag(itemDescription),
-                date: date(from: itemDate),
+                description: itemDescription.stripSymbols,
+                imageURL: itemImageURL,
+                date: itemDate.date,
                 url: itemURL,
                 image: nil
             )
@@ -86,9 +98,22 @@ extension CrawlDataParser: XMLParserDelegate {
 }
 
 private extension CrawlDataParser {
-    func stringByStrippingHTML(_ input: String) -> String {
-        let stringlength = input.count
-        var newString = ""
+    struct Constants {
+        static let dateFormat = "EEE, d MMM yyyy HH:mm:ss Z"
+    }
+}
+
+fileprivate extension String {
+    var date: Date {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = CrawlDataParser.Constants.dateFormat
+        guard let date = dateFormatter.date(from: self) else { return Date() }
+        return date
+    }
+
+    var stripSymbols: String {
+        let length: Int = self.count
+        var result: String = ""
 
         do {
             let regex = try NSRegularExpression(
@@ -96,80 +121,16 @@ private extension CrawlDataParser {
                 options: NSRegularExpression.Options.caseInsensitive
             )
 
-            newString = regex.stringByReplacingMatches(
-                in: input,
+            result = regex.stringByReplacingMatches(
+                in: self,
                 options: NSRegularExpression.MatchingOptions.reportCompletion,
-                range: NSMakeRange(0, stringlength),
+                range: NSMakeRange(0, length),
                 withTemplate: ""
             )
         } catch {
-            print("Error stripping HTML from input string: \(error)")
+            print("Error stripping symbols from string '\(self)': \(error)")
         }
 
-        return newString
-    }
-
-    func getLinkFromImageTag(_ input: String) -> String {
-        do {
-            let regex = try NSRegularExpression(
-                pattern: Constants.imageTagRegex,
-                options: NSRegularExpression.Options.caseInsensitive
-            )
-
-            let results = regex.matches(
-                in: input,
-                options: NSRegularExpression.MatchingOptions.reportCompletion,
-                range: NSMakeRange(0, input.count)
-            )
-
-            if let match = results.first as NSTextCheckingResult? {
-                let str = input as NSString
-                let imgTag = str.substring(with: match.range)
-
-                do {
-                    let imgRegex = try NSRegularExpression(
-                        pattern: Constants.imageTagUrlRegex,
-                        options: NSRegularExpression.Options.caseInsensitive
-                    )
-
-                    let imgResults = imgRegex.matches(
-                        in: imgTag,
-                        options: NSRegularExpression.MatchingOptions.reportCompletion,
-                        range: NSMakeRange(0, imgTag.count)
-                    )
-
-                    if let imgMatch = imgResults.first as NSTextCheckingResult? {
-                        let tagStr = imgTag as NSString
-                        let imgURL = "http:" + tagStr
-                            .substring(with: imgMatch.range)
-                            .replacingOccurrences(of: "\"", with: "")
-
-                        return imgURL
-                    }
-
-                } catch {
-                    print("Error parsing URL from <img> tag: \(error)")
-                }
-            }
-        } catch {
-            print("Error parsing <img> tag: \(error)")
-        }
-
-        return ""
-    }
-
-    func date(from string: String) -> Date {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = Constants.dateFormat
-        guard let date = dateFormatter.date(from: string) else { return Date() }
-        return date
-    }
-}
-
-private extension CrawlDataParser {
-    struct Constants {
-        static let dateFormat = "EEE, d MMM yyyy HH:mm:ss Z"
-        static let imageTagRegex = "<img src=[^>]+>"
-        static let imageTagUrlRegex = "\"//(.*?)\""
+        return result
     }
 }

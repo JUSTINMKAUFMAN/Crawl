@@ -11,12 +11,14 @@ import AppKit
 import Cocoa
 
 class NetworkManager: NSObject {
-    func fetchItems(for keyword: String? = nil, _ completion: @escaping (_ items: [NewsItem]) -> Void) {
-        fetchItemData(keyword) { [unowned self] data in
+    func fetchItems(for keywords: [String]? = nil, _ completion: @escaping (_ items: [NewsItem]) -> Void) {
+        fetchItemData(keywords) { [unowned self] data in
             guard let data = data else { return completion([]) }
             self.parseItems(from: data) { items in
                 self.fetchImages(for: items) { imagedItems in
-                    completion(imagedItems)
+                    completion(
+                        imagedItems.sorted(by: { $0.imageURL.count > $1.imageURL.count })
+                    )
                 }
             }
         }
@@ -40,9 +42,9 @@ class NetworkManager: NSObject {
 }
 
 private extension NetworkManager {
-    func fetchItemData(_ keyword: String? = nil, _ completion: @escaping (_ data: Data?) -> Void) {
+    func fetchItemData(_ keywords: [String]? = nil, _ completion: @escaping (_ data: Data?) -> Void) {
         URLSession.shared.dataTask(
-            with: URLRequest(url: Constants.queryURL(with: keyword)),
+            with: URLRequest(url: Constants.queryURL(with: keywords)),
             completionHandler: { (data, response, error) -> Void in
                 guard let data = data as Data? else { return completion(nil) }
                 completion(data)
@@ -59,16 +61,15 @@ private extension NetworkManager {
     }
 
     func downloadImage(from urlString: String, _ completion: @escaping (_ image: NSImage?) -> Void) {
-        guard urlString.contains("http://"),
-            let url = URL(string: urlString) else {
+        guard urlString.contains("https") else {
             return completion(NSImage(named: "newsIcon"))
         }
 
         URLSession.shared.dataTask(
-            with: URLRequest(url: url),
+            with: URLRequest(url: URL(string: urlString)!),
             completionHandler: { (data, response, error) -> Void in
                 guard let data = data as Data? else { return completion(nil) }
-                completion(NSImage(data: data))
+                return completion(NSImage(data: data))
             }
         ).resume()
     }
@@ -79,9 +80,10 @@ private extension NetworkManager {
         static let googleNewsArticleDateFormat = "EEE, d MMM yyyy HH:mm:ss Z"
         static let imageTagRegex = "<img src=[^>]+>"
         static let imageTagUrlRegex = "\"//(.*?)\""
-        static func queryURL(with keyword: String?) -> URL {
+
+        static func queryURL(with keywords: [String]?) -> URL {
             let urlString: String = "https://news.google.com/" +
-                ((keyword != nil) ? "news/feeds?q=\(keyword!)&output=rss" : "?output=rss")
+                ((keywords != nil) ? "news/feeds?q=\(keywords!.joined(separator: "%20"))&output=rss" : "?output=rss")
             return URL(string: urlString)!
         }
     }

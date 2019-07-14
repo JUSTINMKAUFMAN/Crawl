@@ -2,8 +2,8 @@
 //  NewsItem.swift
 //  Crawl
 //
-//  Created by Justin Kaufman on 7/13/19.
-//  Copyright © 2019 Justin Kaufman. All rights reserved.
+//  Created by Justin Kaufman on 3/23/17.
+//  Copyright © 2017 Justin Kaufman. All rights reserved.
 //
 
 import Foundation
@@ -23,7 +23,7 @@ extension NewsItem {
         return CrawlViewModel(
             title: title,
             url: URL(string: url) ?? URL(string: "https://news.google.com")!,
-            image: image ?? NSImage(named: "newsIcon")!
+            image: image
         )
     }
 }
