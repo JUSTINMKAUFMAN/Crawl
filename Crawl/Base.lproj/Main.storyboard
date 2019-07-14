@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="14835.7" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14835.7"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="R2V-B0-nI4">
+            <objects>
+                <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
+                    <window key="window" title="Crawl" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="IQv-IB-iLA">
+                        <windowStyleMask key="styleMask" resizable="YES"/>
+                        <windowPositionMask key="initialPositionMask" rightStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="0.0" y="0.0" width="1080" height="100"/>
+                        <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <value key="minSize" type="size" width="600" height="100"/>
+                        <connections>
+                            <outlet property="delegate" destination="B8D-0N-5wS" id="aub-CV-n0H"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="XfG-lQ-9wD" kind="relationship" relationship="window.shadowedContentViewController" id="cq2-FE-JQM"/>
+                    </connections>
+                </windowController>
+                <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="213" y="-231"/>
+        </scene>
+        <!--Crawl View Controller-->
+        <scene sceneID="hIz-AP-VOD">
+            <objects>
+                <viewController storyboardIdentifier="CrawlViewController" id="XfG-lQ-9wD" customClass="CrawlViewController" customModule="Crawl" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
+                        <rect key="frame" x="0.0" y="0.0" width="1080" height="100"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="k57-vG-j7D">
+                                <rect key="frame" x="0.0" y="0.0" width="1080" height="100"/>
+                                <subviews>
+                                    <visualEffectView appearanceType="vibrantDark" alphaValue="0.80000000000000004" blendingMode="withinWindow" material="popover" state="active" translatesAutoresizingMaskIntoConstraints="NO" id="zSz-ak-eOQ" userLabel="Blur View">
+                                        <rect key="frame" x="90" y="0.0" width="996" height="72"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="72" id="kVw-dD-JVV"/>
+                                        </constraints>
+                                    </visualEffectView>
+                                    <textField focusRingType="none" horizontalHuggingPriority="499" verticalHuggingPriority="750" horizontalCompressionResistancePriority="499" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a4U-IT-6LZ" userLabel="Crawl Field" customClass="MarqueeLabel" customModule="Crawl" customModuleProvider="target">
+                                        <rect key="frame" x="108" y="9" width="974" height="55"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="55" id="VEg-km-hhV"/>
+                                        </constraints>
+                                        <shadow key="shadow" blurRadius="2">
+                                            <size key="offset" width="-1" height="0.0"/>
+                                            <color key="color" name="shadowColor" catalog="System" colorSpace="catalog"/>
+                                        </shadow>
+                                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" focusRingType="none" alignment="left" title="Synchronizing..." id="YXi-Km-P7s">
+                                            <font key="font" size="45" name="HelveticaNeue"/>
+                                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="scrollingRate">
+                                                <real key="value" value="90"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="scrollingOffset">
+                                                <real key="value" value="10"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </textField>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="hFb-eJ-Pdx" userLabel="Crawl Image Button">
+                                        <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="2UP-x6-ae2"/>
+                                            <constraint firstAttribute="width" secondItem="hFb-eJ-Pdx" secondAttribute="height" multiplier="1:1" id="Wjj-fD-NUf"/>
+                                        </constraints>
+                                        <shadow key="shadow" blurRadius="3">
+                                            <size key="offset" width="-1" height="0.0"/>
+                                            <color key="color" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        </shadow>
+                                        <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="newsIcon" imagePosition="only" alignment="center" transparent="YES" imageScaling="proportionallyUpOrDown" inset="2" id="94X-Zx-8RQ">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="clickCrawlImage:" target="XfG-lQ-9wD" id="72y-5s-TXT"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="a4U-IT-6LZ" secondAttribute="bottom" constant="8.5" id="ETj-0V-hZB"/>
+                                    <constraint firstAttribute="bottom" secondItem="hFb-eJ-Pdx" secondAttribute="bottom" id="GGp-z9-buN"/>
+                                    <constraint firstItem="zSz-ak-eOQ" firstAttribute="leading" secondItem="hFb-eJ-Pdx" secondAttribute="trailing" constant="-10" id="JC5-4A-nRc"/>
+                                    <constraint firstItem="hFb-eJ-Pdx" firstAttribute="leading" secondItem="k57-vG-j7D" secondAttribute="leading" id="KAy-d3-vIY"/>
+                                    <constraint firstAttribute="trailing" secondItem="zSz-ak-eOQ" secondAttribute="trailing" constant="-6" id="KI8-cx-7gb"/>
+                                    <constraint firstAttribute="trailing" secondItem="a4U-IT-6LZ" secondAttribute="trailing" id="TI5-bR-h6g"/>
+                                    <constraint firstAttribute="bottom" secondItem="zSz-ak-eOQ" secondAttribute="bottom" id="VuJ-Kf-eU0"/>
+                                    <constraint firstItem="a4U-IT-6LZ" firstAttribute="leading" secondItem="zSz-ak-eOQ" secondAttribute="leading" constant="20" id="aKu-JJ-aWc"/>
+                                    <constraint firstAttribute="height" constant="100" id="aYK-fE-tAC"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="600" id="fcU-5y-SLM"/>
+                                    <constraint firstItem="hFb-eJ-Pdx" firstAttribute="top" secondItem="k57-vG-j7D" secondAttribute="top" id="qmP-he-4hq"/>
+                                </constraints>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="k57-vG-j7D" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="8Yc-us-L83"/>
+                            <constraint firstAttribute="bottom" secondItem="k57-vG-j7D" secondAttribute="bottom" id="a0F-6j-sws"/>
+                            <constraint firstItem="k57-vG-j7D" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" id="ccR-jB-FLC"/>
+                            <constraint firstAttribute="trailing" secondItem="k57-vG-j7D" secondAttribute="trailing" id="tnO-r1-GWW"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="crawlField" destination="a4U-IT-6LZ" id="Hr1-gb-Cfy"/>
+                        <outlet property="crawlImageButton" destination="hFb-eJ-Pdx" id="rz1-xs-v6z"/>
+                    </connections>
+                </viewController>
+                <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="213" y="815"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="newsIcon" width="256" height="256"/>
+    </resources>
+</document>
