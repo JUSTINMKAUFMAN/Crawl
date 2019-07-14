@@ -13,10 +13,10 @@ import Foundation
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var window: NSWindow!
-    
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         window.isOpaque = false
-        window?.titlebarAppearsTransparent = true
+        window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true
         window.titleVisibility = NSWindow.TitleVisibility.hidden
         window.backgroundColor = NSColor.clear
